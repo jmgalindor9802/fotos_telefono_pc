@@ -1,0 +1,23 @@
+# Compilación y Ejecutables
+build/
+dist/
+*.spec
+*.exe
+
+# Python (Bytecode y Cache)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos Virtuales
+venv/
+env/
+.env/
+
+# Archivos de la Aplicación (Fotos recibidas)
+# Descomenta la línea de abajo si NO quieres subir las fotos de prueba a Git
+# fotos_recibidas/*
+
+# IDEs (VS Code y otros)
+.vscode/
+.idea/
