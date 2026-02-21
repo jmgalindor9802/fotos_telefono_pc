@@ -7,10 +7,9 @@ Incluye sistema de plugins para procesamiento de imágenes.
 import logging
 import os
 import queue
-import sys
 from typing import Callable, List
 
-from config import APP_CONFIG, get_local_ip, save_settings, is_port_available
+from config import APP_CONFIG, get_local_ip, save_settings, find_available_port
 from server import ImageServer
 
 logger = logging.getLogger("manager")
@@ -88,33 +87,24 @@ class AppManager:
         from ui import AppInterface
 
         ip = get_local_ip()
-        port = APP_CONFIG["port"]
+
+        # Auto-seleccionar puerto libre
+        preferred_port = APP_CONFIG["port"]
+        actual_port = find_available_port(preferred_port)
+        APP_CONFIG["port"] = actual_port
+
+        if actual_port != preferred_port:
+            logger.info("Puerto %d ocupado, usando %d", preferred_port, actual_port)
 
         logger.info("=" * 50)
         logger.info("THE ELITE FLOWER — Receptor de Fotos")
         logger.info("=" * 50)
         logger.info("IP local: %s", ip)
-        logger.info("Puerto:   %d", port)
+        logger.info("Puerto:   %d", actual_port)
         logger.info("Carpeta:  %s", APP_CONFIG["upload_folder"])
         logger.info("Upload máx: %d MB", APP_CONFIG["max_upload_mb"])
         logger.info("Procesadores: %d", len(self._processors))
         logger.info("=" * 50)
-
-        # Verificar disponibilidad del puerto
-        if not is_port_available(port):
-            logger.error("⚠ El puerto %d está ocupado por otra aplicación.", port)
-            logger.error("  Cierra la aplicación que lo usa o cambia el puerto en config.py")
-            try:
-                from tkinter import messagebox
-                messagebox.showerror(
-                    "Puerto ocupado",
-                    f"El puerto {port} ya está en uso.\n\n"
-                    "Cierra la otra aplicación que lo utiliza\n"
-                    "o cambia 'port' en config.py."
-                )
-            except Exception:
-                pass
-            sys.exit(1)
 
         # Iniciar servidor Flask
         self._server.start()
@@ -127,3 +117,4 @@ class AppManager:
 
         # Mainloop (bloquea)
         self._gui.mainloop()
+

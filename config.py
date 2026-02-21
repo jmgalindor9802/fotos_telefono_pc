@@ -150,6 +150,16 @@ def is_port_available(port: int) -> bool:
         return False
 
 
+def find_available_port(start_port: int = 5000, max_tries: int = 10) -> int:
+    """Busca un puerto libre empezando desde start_port.
+    Si el puerto preferido está ocupado, prueba los siguientes."""
+    for offset in range(max_tries):
+        port = start_port + offset
+        if is_port_available(port):
+            return port
+    return start_port  # fallback
+
+
 def get_icon_path() -> str | None:
     """Devuelve la ruta al icono .ico si existe."""
     # Buscar en el directorio del bundle (PyInstaller) y en el directorio del exe
